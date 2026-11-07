@@ -83,3 +83,17 @@ Todo o resto pede o cabeçalho `Authorization: Bearer <token>`. Vendas, pedidos,
 - Fora do `localhost`, use HTTPS: sem ele, senha e token viajam abertos pela rede.
 - O CORS está aberto para qualquer origem (`CorsConfig`), para o HTML funcionar aberto direto do arquivo.
 - O painel chama `http://localhost:8080/api`. Para usar outro endereço, abra-o uma vez com `?api=http://servidor:8080/api` no fim da URL; o endereço fica salvo no navegador.
+
+## Deploy no Render
+
+O `Dockerfile` e o `render.yaml` ficam na raiz do repositório. Um único serviço serve o site (`index.html`), o painel (`edhi-painel.html`) e a API em `/api`, ligado a um PostgreSQL do Render.
+
+1. Em [render.com](https://render.com), entre com o GitHub.
+2. **New > Blueprint**, escolha o repositório `ediretalhos` e clique em **Apply**.
+3. Quando o Render pedir `EDHI_ADMIN_SENHA`, digite a senha da Edilene. No ar, a API não sobe com a senha padrão `1234567`.
+4. Espere o build (alguns minutos). O site fica em `https://edhi-retalhos.onrender.com` (ou o nome que o Render mostrar).
+
+Cada `git push` na `main` faz um deploy novo sozinho.
+
+No plano grátis o serviço dorme depois de 15 minutos sem visitas e leva cerca de 1 minuto para acordar. O banco grátis do Render vence depois de 30 dias: antes disso, passe para um plano pago ou baixe o backup pelo painel.
+

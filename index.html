@@ -495,13 +495,14 @@ n.addEventListener('click',function(e){if(e.target.tagName==='A'){n.classList.re
 <script>
 (function(){
 /* Login feito pela API (edhi-backend). As senhas ficam só no servidor, com BCrypt.
-   Endereço da API: http://localhost:8080/api, ou abra o site uma vez com ?api=http://servidor:8080/api */
+   Endereço da API: no ar (Render) é o próprio site + /api. Aberto do arquivo ou num servidor local,
+   usa http://localhost:8080/api. Para forçar outro, abra o site uma vez com ?api=http://servidor:8080/api */
 var CUR='edhi_sessao',ADM='edhi_admin',API_KEY='edhi_api';
 var mem={};
 function get(st,k){try{return window[st].getItem(k);}catch(e){return mem[st+k]||null;}}
 function set(st,k,v){try{window[st].setItem(k,v);}catch(e){mem[st+k]=v;}}
 function del(st,k){try{window[st].removeItem(k);}catch(e){delete mem[st+k];}}
-var API=(function(){var q=new URLSearchParams(location.search).get('api');if(q){set('localStorage',API_KEY,q);return q;}return get('localStorage',API_KEY)||'http://localhost:8080/api';})().replace(/\/$/,'');
+var API=(function(){var q=new URLSearchParams(location.search).get('api');if(q){set('localStorage',API_KEY,q);return q;}return get('localStorage',API_KEY)||(/^https?:$/.test(location.protocol)&&!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?location.origin:'http://localhost:8080')+'/api';})().replace(/\/$/,'');
 function sessao(){try{return JSON.parse(get('localStorage',CUR)||'null');}catch(e){return null;}}
 function api(method,path,body){var s=sessao(),h={};if(body)h['Content-Type']='application/json';if(s&&s.token)h['Authorization']='Bearer '+s.token;
   return fetch(API+path,{method:method,headers:h,body:body?JSON.stringify(body):undefined}).then(function(r){

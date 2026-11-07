@@ -1,0 +1,36 @@
+# Blueprint do Render: cria o banco PostgreSQL e o serviço com o site + API.
+# No render.com: New > Blueprint > escolha este repositório > Apply.
+
+databases:
+  - name: edhi-db
+    plan: free
+    region: virginia
+    databaseName: edhi_db
+    user: edhi
+
+services:
+  - type: web
+    name: edhi-retalhos
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_HOST
+        fromDatabase: { name: edhi-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: edhi-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: edhi-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: edhi-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: edhi-db, property: password }
+      - key: SHOW_SQL
+        value: "false"
+      - key: EDHI_PRODUCAO
+        value: "true"
+      # Senha da Edilene. O Render pede para você digitar na hora do Apply; ela não fica no código.
+      # Só vale na primeira vez que a API sobe (é quando a conta dela é criada).
+      - key: EDHI_ADMIN_SENHA
+        sync: false
