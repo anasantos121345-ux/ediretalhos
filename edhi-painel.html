@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel da Edilene</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect x='2' y='2' width='20' height='20' fill='%23E8590C'/%3E%3Crect x='22' y='2' width='20' height='20' fill='%23F2B705'/%3E%3Crect x='2' y='22' width='20' height='20' fill='%231B7F79'/%3E%3Crect x='22' y='22' width='20' height='20' fill='%23C9304F'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--terra:#A8512F;--red:#CF3523;--red-t:#C23020;--orange:#F5A04A;--peach:#FDEFE8;--line:#F4D3C7;--ivory:#FFFAF7;--ink:#4A1B14;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ivory);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-size:16px;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+header.top{background:#fff;border-bottom:2px solid var(--line)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px;padding-top:14px;padding-bottom:14px}
+.brand{display:flex;align-items:baseline;gap:8px;color:var(--red);text-decoration:none}
+.brand b{font-family:'Great Vibes',cursive;font-weight:400;font-size:40px;line-height:1}
+.brand span{font-weight:800;font-size:18px}
+.top-actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 20px;border-radius:999px;border:2px solid var(--red);background:#fff;color:var(--red-t);font-weight:800;text-decoration:none;font-size:15px}
+.btn.primary{background:var(--red);color:#fff}
+.btn.small{min-height:36px;padding:6px 14px;font-size:14px}
+.btn.danger{border-color:#8A3A22;color:#8A3A22}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;padding:20px 0 0}
+.tab{min-height:44px;padding:10px 20px;border-radius:999px;border:2px solid var(--red);background:#fff;color:var(--red-t);font-weight:800}
+.tab[aria-selected="true"]{background:var(--red);color:#fff}
+main{padding:24px 0 64px}
+.panel{display:none;flex-direction:column;gap:24px}
+.panel.on{display:flex}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.card{background:#fff;border:2px solid var(--line);border-radius:22px;padding:22px}
+.kpi span.l{font-size:14px;font-weight:700}
+.kpi strong{display:block;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:38px;line-height:1.1;color:var(--terra);font-variant-numeric:tabular-nums;margin:4px 0}
+.kpi small{font-size:13px}
+h2{margin:0;font-size:20px;font-weight:800}
+.sub{margin:4px 0 0;font-size:14px;line-height:1.5;max-width:640px}
+.cols{display:flex;flex-wrap:wrap;gap:24px}
+.cols>.card{flex:1 1 320px;min-width:0}
+.cols>.wide{flex:2 1 520px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:210px;border-bottom:2px solid var(--ink);padding:0 2px}
+.bar{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.bar i{display:block;width:100%;border-radius:6px 6px 0 0;background:var(--orange);min-height:2px}
+.bar.cur i{background:var(--red)}
+.bar em{font-style:normal;font-size:10px;font-weight:800;font-variant-numeric:tabular-nums}
+.bar-labels{display:flex;gap:6px;padding:0 2px;margin-top:6px}
+.bar-labels span{flex:1 1 0;min-width:0;text-align:center;font-size:11px;font-weight:700}
+.hbar{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.hbar .row{display:flex;justify-content:space-between;font-weight:800;font-size:15px;gap:12px}
+.hbar .track{height:14px;border-radius:999px;background:var(--peach);overflow:hidden}
+.hbar .fill{height:100%;border-radius:999px;background:var(--red)}
+.hbar.alt .fill{background:var(--terra)}
+form.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;align-items:end}
+label{display:flex;flex-direction:column;gap:6px;font-weight:800;font-size:14px}
+input,select,textarea{min-height:44px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:#fff}
+textarea{resize:vertical}
+.tablewrap{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:10px 8px;border-bottom:2px solid var(--ink);white-space:nowrap}
+td{padding:12px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num,th.num{text-align:right}
+.pill{display:inline-flex;align-items:center;min-height:36px;padding:4px 14px;border-radius:999px;border:2px solid var(--red);font-weight:800;font-size:14px;background:#fff;color:var(--red-t)}
+.pill.s1{background:#FFE3C2;color:var(--ink)}
+.pill.s2{background:var(--orange);color:var(--ink)}
+.pill.s3{background:var(--terra);color:#fff;border-color:var(--terra)}
+.chk{min-height:36px;padding:4px 10px;border-radius:10px;border:2px solid var(--terra);background:#fff;color:#8A3A22;font-weight:800;font-size:13px}
+.chk.on{background:var(--terra);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.empty{padding:28px 16px;text-align:center;background:var(--ivory);border:2px dashed var(--line);border-radius:16px;line-height:1.55}
+.notice{padding:12px 16px;border-radius:14px;background:#FFE9C7;color:#5A3A00;font-weight:700;font-size:14px;line-height:1.5}
+.read{padding:12px 16px;border-radius:14px;background:var(--peach);line-height:1.5;font-size:15px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--terra);color:#fff;font-weight:800;font-size:13px}
+.caption{white-space:pre-line;line-height:1.6;padding:16px;background:var(--ivory);border:2px solid var(--line);border-radius:14px}
+.hint{font-size:13px;line-height:1.5}
+@media (max-width:640px){.kpi strong{font-size:32px}.bars{height:170px}.bar em{display:none}.bar-labels span{font-size:10px}}
+
+@media (max-width:700px){
+ .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .kpi{padding:16px}
+ .kpi strong{font-size:26px}
+ .tablewrap{overflow:visible}
+ table,thead,tbody,tr,td{display:block;min-width:0}
+ table{min-width:0}
+ thead{display:none}
+ tr{border:2px solid var(--line);border-radius:16px;padding:8px 14px;margin-bottom:12px;background:#fff}
+ td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;padding:6px 0;text-align:right}
+ td::before{content:attr(data-label);font-weight:800;font-size:13px;text-align:left;flex:none}
+ td[data-label=""]::before{content:none}
+ td:last-child{justify-content:flex-end}
+ td .chips{justify-content:flex-end}
+ header.top .btn.small{flex:1 1 auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.notice.ok{background:#DDF3E4;color:#0F4D2A}
+.notice code{font-size:13px;background:rgba(255,255,255,.6);padding:1px 5px;border-radius:6px}
+button:disabled{opacity:.6;cursor:wait}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<a class="brand" href="index.html" aria-label="Voltar ao site éDhi Retalhos"><b>éDhi</b><span>retalhos</span></a>
+<div class="top-actions">
+<a class="btn small" href="index.html">Ver o site</a>
+<button class="btn small" type="button" id="btnBackup">Baixar backup</button>
+<label class="btn small" style="flex-direction:row;cursor:pointer;gap:0" for="fileRestore">Restaurar backup</label>
+<input id="fileRestore" type="file" accept="application/json,.json" style="position:absolute;left:-9999px;width:1px;height:1px" aria-label="Restaurar backup">
+</div>
+</div></header>
+
+<div class="wrap">
+<div id="storageWarn" class="notice" role="alert" style="display:none;margin-top:16px"></div>
+<div id="msg" class="notice" role="status" aria-live="polite" style="display:none;margin-top:16px"></div>
+<nav class="tabs" role="tablist" aria-label="Seções do painel">
+<button class="tab" role="tab" data-tab="resumo" aria-selected="true">Resumo</button>
+<button class="tab" role="tab" data-tab="vendas" aria-selected="false">Vendas</button>
+<button class="tab" role="tab" data-tab="pedidos" aria-selected="false">Pedidos</button>
+<button class="tab" role="tab" data-tab="feiras" aria-selected="false">Feiras</button>
+<button class="tab" role="tab" data-tab="legendas" aria-selected="false">Legendas</button>
+</nav>
+
+<main>
+<!-- RESUMO -->
+<section class="panel on" id="p-resumo" role="tabpanel">
+<div id="emptyHome" class="card" style="display:none">
+<h2>Comece por aqui</h2>
+<p class="sub">Ainda não há vendas lançadas. Lance a primeira na aba Vendas, ou veja como o painel funciona com dados de exemplo.</p>
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px"><button class="btn primary" type="button" id="btnDemo">Carregar dados de exemplo</button><button class="btn" type="button" data-go="vendas">Lançar uma venda</button></div>
+</div>
+<div class="kpis" id="kpis"></div>
+<div class="cols">
+<section class="card wide" aria-labelledby="h-m"><h2 id="h-m">Vendas por mês</h2><p class="sub">Últimos 12 meses. O mês atual aparece em vermelho. Valores em R$ mil.</p><div style="margin-top:16px"><div class="bars" id="bars"></div><div class="bar-labels" id="barLabels"></div></div></section>
+<section class="card" aria-labelledby="h-c"><h2 id="h-c">Vendas por canal</h2><p class="sub">De onde vem o dinheiro, em todo o período lançado.</p><div class="hbar" id="canais"></div></section>
+</div>
+<div class="cols">
+<section class="card" aria-labelledby="h-t"><h2 id="h-t">O que mais vende</h2><p class="sub">Participação de cada peça no valor vendido.</p><div class="hbar alt" id="tops"></div></section>
+<section class="card" aria-labelledby="h-d"><h2 id="h-d">Dados</h2><p class="sub">Tudo fica guardado no servidor do painel. Baixe um backup de vez em quando.</p><div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px"><button class="btn" type="button" id="btnDemo2">Carregar exemplo</button><button class="btn danger" type="button" id="btnClear">Apagar tudo</button></div></section>
+</div>
+</section>
+
+<!-- VENDAS -->
+<section class="panel" id="p-vendas" role="tabpanel">
+<section class="card" aria-labelledby="h-nv"><h2 id="h-nv">Lançar venda</h2>
+<form class="grid" id="fVenda" style="margin-top:14px">
+<label>Data<input type="date" name="date" required></label>
+<label>Cliente<input type="text" name="cliente" placeholder="Nome ou empresa" required></label>
+<label>Peça<select name="produto"></select></label>
+<label>Quantidade<input type="number" name="qtd" min="1" step="1" value="1" required></label>
+<label>Valor total (R$)<input type="number" name="valor" min="0" step="0.01" placeholder="0,00" required></label>
+<label>Canal<select name="canal"></select></label>
+<button class="btn primary" type="submit">Salvar venda</button>
+</form></section>
+<section class="card" aria-labelledby="h-lv"><div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center"><h2 id="h-lv">Vendas lançadas</h2><button class="btn small" type="button" id="btnCsv">Baixar planilha (CSV)</button></div>
+<div class="tablewrap"><table><thead><tr><th>Data</th><th>Cliente</th><th>Peça</th><th class="num">Qtd</th><th class="num">Valor</th><th>Canal</th><th></th></tr></thead><tbody id="tVendas"></tbody></table></div><div id="eVendas" class="empty" style="display:none;margin-top:12px">Nenhuma venda lançada ainda.</div></section>
+</section>
+
+<!-- PEDIDOS -->
+<section class="panel" id="p-pedidos" role="tabpanel">
+<section class="card" aria-labelledby="h-np"><h2 id="h-np">Novo pedido</h2>
+<form class="grid" id="fPedido" style="margin-top:14px">
+<label>Cliente<input type="text" name="cliente" placeholder="Nome ou empresa" required></label>
+<label>Peça<select name="peca"></select></label>
+<label>Quantidade<input type="number" name="qtd" min="1" step="1" value="1" required></label>
+<label>Valor combinado (R$)<input type="number" name="valor" min="0" step="0.01" placeholder="0,00" required></label>
+<label>Canal<select name="canal"></select></label>
+<label>Prazo<input type="date" name="prazo"></label>
+<button class="btn primary" type="submit">Salvar pedido</button>
+</form></section>
+<section class="card" aria-labelledby="h-lp"><h2 id="h-lp">Pedidos</h2><p class="sub">Toque no estado para avançar o pedido. Antes de entregar, confira medida, estampa e cheiro. Quando entregar, lance como venda.</p>
+<div class="tablewrap"><table><thead><tr><th>Cliente</th><th>Peça</th><th class="num">Qtd</th><th class="num">Valor</th><th>Prazo</th><th>Estado</th><th>Conferência</th><th></th></tr></thead><tbody id="tPedidos"></tbody></table></div><div id="ePedidos" class="empty" style="display:none;margin-top:12px">Nenhum pedido por aqui.</div></section>
+</section>
+
+<!-- FEIRAS -->
+<section class="panel" id="p-feiras" role="tabpanel">
+<section class="card" aria-labelledby="h-nf"><h2 id="h-nf">Registrar feira</h2><p class="sub">Anote quanto custou a vaga e quanto você vendeu. O painel mostra em qual vale a pena voltar.</p>
+<form class="grid" id="fFeira" style="margin-top:14px">
+<label>Feira<input type="text" name="nome" placeholder="Nome da feira" required></label>
+<label>Data<input type="date" name="data"></label>
+<label>Custo da vaga (R$)<input type="number" name="custo" min="0" step="0.01" value="0" required></label>
+<label>Vendas na feira (R$)<input type="number" name="vendas" min="0" step="0.01" value="0" required></label>
+<button class="btn primary" type="submit">Salvar feira</button>
+</form></section>
+<section class="card" aria-labelledby="h-lf"><h2 id="h-lf">Qual feira vale a pena</h2>
+<div class="tablewrap"><table><thead><tr><th>Feira</th><th>Data</th><th class="num">Vaga</th><th class="num">Vendas</th><th class="num">Retorno</th><th></th></tr></thead><tbody id="tFeiras"></tbody></table></div><div id="eFeiras" class="empty" style="display:none;margin-top:12px">Nenhuma feira registrada.</div>
+<p class="read" id="leituraFeira" style="display:none;margin:16px 0 0"></p></section>
+</section>
+
+<!-- LEGENDAS -->
+<section class="panel" id="p-legendas" role="tabpanel">
+<section class="card" aria-labelledby="h-lg"><h2 id="h-lg">Legendas prontas para o Instagram</h2><p class="sub">Escolha a peça e o momento. O painel monta uma legenda com a sua voz, e você ajusta antes de postar.</p>
+<div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px">
+<label>Peça<select id="capProd"></select></label>
+<label>Momento<select id="capMom"><option value="dia">Dia a dia</option><option value="natal">Natal</option><option value="encomenda">Encomendas abertas</option><option value="aula">Aula social</option></select></label>
+</div>
+<div class="caption" id="capText" style="margin-top:16px"></div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px"><button class="btn primary" type="button" id="btnCap">Copiar legenda</button><span id="capNote" style="font-weight:700;font-size:14px"></span></div>
+<p class="hint" style="margin:14px 0 0">As legendas são modelos de texto, e não criadas por inteligência artificial. A geração de imagens exige um serviço online e ainda não está neste painel.</p></section>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+/* Endereço da API. Para trocar, abra o painel com ?api=http://servidor:8080/api uma vez. */
+var API_PADRAO='http://localhost:8080/api';
+var API=(function(){
+  var q=null;try{q=new URLSearchParams(location.search).get('api');}catch(e){}
+  try{if(q)localStorage.setItem('edhi_api',q);return localStorage.getItem('edhi_api')||API_PADRAO;}catch(e){return q||API_PADRAO;}
+})().replace(/\/+$/,'');
+var PROD=['Ecobag','Tapete','Colcha','Pano de copa','Outro'];
+var CANAL=['Feira','WhatsApp e Instagram','Empresa e brinde'];
+var STATUS=['Novo','Em produção','Pronto para conferir','Entregue'];
+var CHECKS=['Medida','Estampa','Cheiro'];
+var CHECK_PATH=['medida','estampa','cheiro'];
+var state={sales:[],orders:[],fairs:[]};
+var online=false;
+
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+var brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+function money(v){return brl.format(v||0);}
+function pad(n){return n<10?'0'+n:''+n;}
+function today(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function monthKey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1);}
+function fdate(s){if(!s)return '';var p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s;}
+var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+/* ---------- API ---------- */
+function api(method,path,body){
+  var opt={method:method,headers:{}};
+  if(body!==undefined){opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(body);}
+  return fetch(API+path,opt).then(function(r){
+    if(r.status===204)return null;
+    return r.text().then(function(t){
+      var d=null;try{d=t?JSON.parse(t):null;}catch(e){}
+      if(!r.ok)throw new Error(d&&d.mensagem?d.mensagem:'O servidor recusou a operação (erro '+r.status+').');
+      return d;
+    });
+  },function(){
+    online=false;showOffline();
+    var err=new Error('Não consegui falar com o servidor.');err.offline=true;throw err;
+  });
+}
+function msg(t,ok){var m=$('#msg');clearTimeout(msg.t);m.textContent=t||'';m.className='notice'+(ok?' ok':'');m.style.display=t?'block':'none';if(t)msg.t=setTimeout(function(){m.style.display='none';},6000);}
+function fail(e){if(e&&e.offline)return;msg((e&&e.message)||'Algo deu errado.');}
+function showOffline(){
+  var w=$('#storageWarn');w.style.display='block';
+  w.innerHTML='Não consegui falar com o servidor em <code>'+esc(API)+'</code>. Confira se o backend está rodando (<code>mvnw.cmd spring-boot:run</code> na pasta edhi-backend). <button class="btn small" type="button" id="btnRetry" style="margin-left:6px">Tentar de novo</button>';
+  $('#btnRetry').addEventListener('click',function(){load().catch(fail);});
+  renderAll();
+}
+
+/* A API devolve os nomes em português; aqui viram o formato que o painel já usava. */
+function mapSale(v){return {id:String(v.id),date:v.data,cliente:v.cliente,produto:v.produto,qtd:v.quantidade,valor:v.valor,canal:v.canal};}
+function mapOrder(p){return {id:String(p.id),cliente:p.cliente,peca:p.peca,qtd:p.quantidade,valor:p.valor,canal:p.canal,prazo:p.prazo||'',status:Math.max(0,STATUS.indexOf(p.status)),checks:[p.medidaConferida,p.estampaConferida,p.cheiroConferido],launched:p.lancado};}
+function mapFair(f){return {id:String(f.id),nome:f.nome,data:f.data||'',custo:f.custo,vendas:f.vendas};}
+
+function load(){
+  return Promise.all([api('GET','/vendas'),api('GET','/pedidos'),api('GET','/feiras')]).then(function(r){
+    state.sales=r[0].map(mapSale);state.orders=r[1].map(mapOrder);state.fairs=r[2].map(mapFair);
+    online=true;$('#storageWarn').style.display='none';renderAll();
+  });
+}
+/* Faz a chamada, recarrega tudo do servidor e mostra a mensagem. */
+function act(p,okMsg){return p.then(load).then(function(){if(okMsg)msg(okMsg,true);}).catch(fail);}
+function busy(form,p,done){var b=form.querySelector('[type=submit]');b.disabled=true;
+  p.then(load).then(done).catch(fail).then(function(){b.disabled=false;});}
+
+/* ---------- selects ---------- */
+function fillSelect(sel,list){sel.innerHTML=list.map(function(x){return '<option>'+esc(x)+'</option>';}).join('');}
+fillSelect($('#fVenda [name=produto]'),PROD);fillSelect($('#fVenda [name=canal]'),CANAL);
+fillSelect($('#fPedido [name=peca]'),PROD);fillSelect($('#fPedido [name=canal]'),CANAL);
+fillSelect($('#capProd'),PROD.slice(0,4));
+$('#fVenda [name=date]').value=today();
+
+/* ---------- tabs ---------- */
+function go(tab){
+  $$('.tab').forEach(function(b){b.setAttribute('aria-selected',b.getAttribute('data-tab')===tab?'true':'false');});
+  $$('.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+tab);});
+  window.scrollTo({top:0});
+}
+$$('.tab').forEach(function(b){b.addEventListener('click',function(){go(b.getAttribute('data-tab'));});});
+$$('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(b.getAttribute('data-go'));});});
+
+/* ---------- resumo ---------- */
+function sum(list,f){return list.reduce(function(a,x){return a+(f(x)||0);},0);}
+function renderResumo(){
+  var has=state.sales.length>0;
+  $('#emptyHome').style.display=online&&!has?'block':'none';
+  var now=new Date(),cur=monthKey(now),prev=monthKey(new Date(now.getFullYear(),now.getMonth()-1,1));
+  var inCur=state.sales.filter(function(s){return (s.date||'').slice(0,7)===cur;});
+  var inPrev=state.sales.filter(function(s){return (s.date||'').slice(0,7)===prev;});
+  var vCur=sum(inCur,function(s){return +s.valor;}),vPrev=sum(inPrev,function(s){return +s.valor;});
+  var qtd=sum(inCur,function(s){return +s.qtd;});
+  var ticket=inCur.length?vCur/inCur.length:0;
+  var open=state.orders.filter(function(o){return o.status<3;});
+  var soon=open.filter(function(o){if(!o.prazo)return false;var d=(new Date(o.prazo+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000;return d<=7;}).length;
+  var cmp=vPrev>0?(vCur>=vPrev?Math.round((vCur/vPrev-1)*100)+'% acima':Math.round((1-vCur/vPrev)*100)+'% abaixo')+' do mês anterior':'Sem mês anterior para comparar';
+  $('#kpis').innerHTML=
+   '<div class="card kpi"><span class="l">Vendas do mês</span><strong>'+money(vCur)+'</strong><small>'+cmp+'</small></div>'+
+   '<div class="card kpi"><span class="l">Vendas lançadas no mês</span><strong>'+inCur.length+'</strong><small>Ticket médio '+money(ticket)+'</small></div>'+
+   '<div class="card kpi"><span class="l">Peças vendidas no mês</span><strong>'+qtd+'</strong><small>Soma das quantidades</small></div>'+
+   '<div class="card kpi"><span class="l">Pedidos em aberto</span><strong>'+open.length+'</strong><small>'+soon+' com prazo em até 7 dias</small></div>';
+  var months=[];for(var i=11;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({k:monthKey(d),n:MESES[d.getMonth()]});}
+  var vals=months.map(function(m){return sum(state.sales.filter(function(s){return (s.date||'').slice(0,7)===m.k;}),function(s){return +s.valor;});});
+  var max=Math.max.apply(null,vals.concat([1]));
+  $('#bars').innerHTML=months.map(function(m,i){var v=vals[i];var h=Math.round(v/max*80);var lab=v>=1000?(v/1000).toFixed(1).replace('.',',').replace(',0',''):(v>0?(v/1000).toFixed(1).replace('.',','):'0');
+    return '<div class="bar'+(m.k===cur?' cur':'')+'" title="'+m.n+': '+money(v)+'"><em>'+lab+'</em><i style="height:'+h+'%"></i></div>';}).join('');
+  $('#barLabels').innerHTML=months.map(function(m){return '<span>'+m.n+'</span>';}).join('');
+  function share(list,keyf,names,el){
+    var total=sum(list,function(s){return +s.valor;});
+    if(!total){el.innerHTML='<div class="empty">Sem vendas para mostrar.</div>';return;}
+    el.innerHTML=names.map(function(n){var v=sum(list.filter(function(s){return keyf(s)===n;}),function(s){return +s.valor;});return {n:n,v:v};})
+      .filter(function(x){return x.v>0;}).sort(function(a,b){return b.v-a.v;})
+      .map(function(x){var p=Math.round(x.v/total*100);return '<div><div class="row"><span>'+esc(x.n)+'</span><span>'+p+'%</span></div><div class="track"><div class="fill" style="width:'+p+'%"></div></div></div>';}).join('');
+  }
+  share(state.sales,function(s){return s.canal;},CANAL,$('#canais'));
+  share(state.sales,function(s){return s.produto;},PROD,$('#tops'));
+}
+
+/* ---------- vendas ---------- */
+function renderVendas(){
+  var list=state.sales.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+  $('#tVendas').innerHTML=list.map(function(s){return '<tr><td>'+fdate(s.date)+'</td><td>'+esc(s.cliente)+'</td><td>'+esc(s.produto)+'</td><td class="num">'+esc(s.qtd)+'</td><td class="num">'+money(+s.valor)+'</td><td>'+esc(s.canal)+'</td><td><button class="btn small danger" type="button" data-del-sale="'+esc(s.id)+'" aria-label="Apagar venda de '+esc(s.cliente)+'">Apagar</button></td></tr>';}).join('');
+  $('#eVendas').style.display=list.length?'none':'block';
+}
+$('#fVenda').addEventListener('submit',function(e){e.preventDefault();var f=e.target;
+  busy(f,api('POST','/vendas',{data:f.date.value||null,cliente:f.cliente.value.trim(),produto:f.produto.value,quantidade:+f.qtd.value,valor:+f.valor.value,canal:f.canal.value}),
+    function(){f.cliente.value='';f.valor.value='';f.qtd.value=1;f.cliente.focus();msg('Venda salva.',true);});});
+$('#tVendas').addEventListener('click',function(e){var b=e.target.closest('[data-del-sale]');if(!b)return;
+  act(api('DELETE','/vendas/'+encodeURIComponent(b.getAttribute('data-del-sale'))),'Venda apagada.');});
+function download(name,type,text){try{var blob=new Blob([text],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},1500);}catch(err){msg('Este navegador não permitiu baixar o arquivo.');}}
+$('#btnCsv').addEventListener('click',function(){
+  var rows=[['Data','Cliente','Peça','Quantidade','Valor','Canal']].concat(state.sales.map(function(s){return [s.date,s.cliente,s.produto,s.qtd,String(s.valor).replace('.',','),s.canal];}));
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(';');}).join('\r\n');
+  download('vendas-edhi.csv','text/csv;charset=utf-8','﻿'+csv);
+});
+
+/* ---------- pedidos ---------- */
+function renderPedidos(){
+  var list=state.orders.slice().sort(function(a,b){return (a.status===3)-(b.status===3)||(a.prazo||'9999').localeCompare(b.prazo||'9999');});
+  $('#tPedidos').innerHTML=list.map(function(o){
+    var checks=CHECKS.map(function(c,j){var on=!!o.checks[j];return '<button type="button" class="chk'+(on?' on':'')+'" aria-pressed="'+on+'" data-chk="'+esc(o.id)+':'+j+'">'+(on?'✓ ':'')+c+'</button>';}).join('');
+    var extra=o.status===3&&!o.launched?'<button class="btn small primary" type="button" data-launch="'+esc(o.id)+'">Lançar como venda</button>':(o.launched?'<span class="badge">Lançado</span>':'');
+    return '<tr><td>'+esc(o.cliente)+'</td><td>'+esc(o.peca)+'</td><td class="num">'+esc(o.qtd)+'</td><td class="num">'+money(+o.valor)+'</td><td>'+(o.prazo?fdate(o.prazo):'—')+'</td><td><button type="button" class="pill s'+o.status+'" data-adv="'+esc(o.id)+'" title="Avançar estado">'+STATUS[o.status]+'</button></td><td><div class="chips">'+checks+'</div></td><td><div class="chips">'+extra+'<button class="btn small danger" type="button" data-del-order="'+esc(o.id)+'" aria-label="Apagar pedido de '+esc(o.cliente)+'">Apagar</button></div></td></tr>';}).join('');
+  $('#ePedidos').style.display=list.length?'none':'block';
+}
+$('#fPedido').addEventListener('submit',function(e){e.preventDefault();var f=e.target;
+  busy(f,api('POST','/pedidos',{cliente:f.cliente.value.trim(),peca:f.peca.value,quantidade:+f.qtd.value,valor:+f.valor.value,canal:f.canal.value,prazo:f.prazo.value||null}),
+    function(){f.cliente.value='';f.valor.value='';f.qtd.value=1;f.prazo.value='';f.cliente.focus();msg('Pedido salvo.',true);});});
+$('#tPedidos').addEventListener('click',function(e){
+  var t=e.target.closest('button');if(!t)return;
+  var base='/pedidos/';
+  if(t.hasAttribute('data-adv'))act(api('PATCH',base+encodeURIComponent(t.getAttribute('data-adv'))+'/avancar'));
+  else if(t.hasAttribute('data-chk')){var p=t.getAttribute('data-chk').split(':');act(api('PATCH',base+encodeURIComponent(p[0])+'/conferencia/'+CHECK_PATH[+p[1]]));}
+  else if(t.hasAttribute('data-del-order'))act(api('DELETE',base+encodeURIComponent(t.getAttribute('data-del-order'))),'Pedido apagado.');
+  else if(t.hasAttribute('data-launch'))act(api('POST',base+encodeURIComponent(t.getAttribute('data-launch'))+'/lancar-venda'),'Venda lançada.');
+});
+
+/* ---------- feiras ---------- */
+function renderFeiras(){
+  var list=state.fairs.map(function(f){return {f:f,r:+f.custo>0?f.vendas/f.custo:null};}).sort(function(a,b){return (b.r==null?-1:b.r)-(a.r==null?-1:a.r);});
+  var best=list.filter(function(x){return x.r!=null;})[0];
+  $('#tFeiras').innerHTML=list.map(function(x){var f=x.f;var isBest=best&&best.f.id===f.id;var ret=x.r==null?'sem custo':x.r.toFixed(1).replace('.',',')+'x';
+    return '<tr><td>'+esc(f.nome)+'</td><td>'+(f.data?fdate(f.data):'—')+'</td><td class="num">'+money(+f.custo)+'</td><td class="num">'+money(+f.vendas)+'</td><td class="num">'+(isBest?'<span class="badge">'+ret+'</span>':ret)+'</td><td><button class="btn small danger" type="button" data-del-fair="'+esc(f.id)+'" aria-label="Apagar feira '+esc(f.nome)+'">Apagar</button></td></tr>';}).join('');
+  $('#eFeiras').style.display=list.length?'none':'block';
+  var lt=$('#leituraFeira');
+  if(best){var top=list.slice().sort(function(a,b){return b.f.vendas-a.f.vendas;})[0];
+    lt.style.display='block';lt.innerHTML='<strong>Leitura:</strong> '+esc(best.f.nome)+' devolve mais por real investido ('+best.r.toFixed(1).replace('.',',')+'x)'+(top.f.id!==best.f.id?', enquanto '+esc(top.f.nome)+' vendeu mais em valor total.':'.');}
+  else lt.style.display='none';
+}
+$('#fFeira').addEventListener('submit',function(e){e.preventDefault();var f=e.target;
+  busy(f,api('POST','/feiras',{nome:f.nome.value.trim(),data:f.data.value||null,custo:+f.custo.value,vendas:+f.vendas.value}),
+    function(){f.nome.value='';f.data.value='';f.custo.value=0;f.vendas.value=0;f.nome.focus();msg('Feira salva.',true);});});
+$('#tFeiras').addEventListener('click',function(e){var b=e.target.closest('[data-del-fair]');if(!b)return;
+  act(api('DELETE','/feiras/'+encodeURIComponent(b.getAttribute('data-del-fair'))),'Feira apagada.');});
+
+/* ---------- legendas ---------- */
+var CAP={
+ 'Ecobag':'Esta ecobag nasceu de tecidos que seriam descartados. Cada retalho tem uma história, e agora ela vai com você para a feira, para o trabalho e para o dia a dia.',
+ 'Tapete':'Retalhos emendados com cuidado viram um tapete que aquece a casa. Cada peça é única e pode ser feita no tamanho que você precisa.',
+ 'Colcha':'Cada ponto desta colcha de fuxico guarda um pedaço da nossa ancestralidade. Uma peça que une passado e presente e leva aconchego para o seu lar.',
+ 'Pano de copa':'Pano de copa com a cara da sua cozinha e frases que fazem rir. Um presente que todo mundo pede de novo.'
+};
+var END={dia:'Peças únicas, feitas à mão.',natal:'Neste Natal, distribua amor, abraços e indiretas. Encomendas de fim de ano com vagas limitadas, por ordem de pedido.',encomenda:'Encomendas abertas! Escolha as cores e as medidas pelo WhatsApp.',aula:'Ensinar a costurar é abrir possibilidades. Quer uma aula na sua igreja ou ONG? Chame no WhatsApp.'};
+function caption(){var p=$('#capProd').value,m=$('#capMom').value;
+  var tag={Ecobag:'#ecobag',Tapete:'#tapetederetalhos','Colcha':'#colchadefuxico','Pano de copa':'#panodecopa'}[p]||'';
+  return CAP[p]+'\n\n'+END[m]+'\n\n#éDhiRetalhos '+tag+' #sustentabilidade #feitoamao';}
+function renderCap(){$('#capText').textContent=caption();$('#capNote').textContent='';}
+$('#capProd').addEventListener('change',renderCap);$('#capMom').addEventListener('change',renderCap);
+$('#btnCap').addEventListener('click',function(){var t=caption();var fail2='Não deu para copiar. Selecione o texto e copie.';
+  try{navigator.clipboard.writeText(t).then(function(){$('#capNote').textContent='Legenda copiada.';},function(){$('#capNote').textContent=fail2;});}catch(err){$('#capNote').textContent=fail2;}});
+
+/* ---------- dados: exemplo, apagar, backup ---------- */
+/* O exemplo usa o backup da API: lê tudo, troca as vendas de exemplo antigas pelas novas e grava de volta. */
+function demo(){
+  api('GET','/backup').then(function(b){
+    var now=new Date(),s=[],n=0;
+    var base=[[9,'Ecobag',140,3000,'Empresa e brinde'],[4,'Pano de copa',60,720,'WhatsApp e Instagram'],[15,'Ecobag',30,540,'Feira'],[22,'Tapete',1,260,'Feira']];
+    for(var i=5;i>=0;i--){base.forEach(function(x,j){var d=new Date(now.getFullYear(),now.getMonth()-i,Math.min(x[0],28));
+      s.push({id:'d'+(n++),date:d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),cliente:'[EXEMPLO] Cliente '+(j+1),produto:x[1],qtd:x[2],valor:Math.round(x[3]*(0.8+0.1*((i+j)%5))),canal:x[4]});});}
+    var sales=(b.sales||[]).filter(function(x){return String(x.cliente).indexOf('[EXEMPLO]')!==0;}).concat(s);
+    var orders=(b.orders||[]).concat([{id:'o',cliente:'[EXEMPLO] Faculdade',peca:'Ecobag',qtd:140,valor:2100,canal:'Empresa e brinde',prazo:today(),status:1,checks:[true,false,false],launched:false}]);
+    var fairs=(b.fairs||[]).concat([{id:'f1',nome:'[EXEMPLO] Feira do Rosário',data:'',custo:400,vendas:2100},{id:'f2',nome:'[EXEMPLO] Feira Preta',data:'',custo:1800,vendas:5200}]);
+    return api('POST','/backup',{sales:sales,orders:orders,fairs:fairs});
+  }).then(load).then(function(){msg('Dados de exemplo carregados.',true);}).catch(fail);
+}
+$('#btnDemo').addEventListener('click',demo);$('#btnDemo2').addEventListener('click',demo);
+var armed=false,armT;
+$('#btnClear').addEventListener('click',function(){var b=this;
+  if(!armed){armed=true;b.textContent='Clique de novo para apagar tudo';armT=setTimeout(function(){armed=false;b.textContent='Apagar tudo';},4000);return;}
+  clearTimeout(armT);armed=false;b.textContent='Apagar tudo';act(api('DELETE','/dados'),'Tudo apagado.');});
+$('#btnBackup').addEventListener('click',function(){
+  api('GET','/backup').then(function(d){download('backup-painel-edhi-'+today()+'.json','application/json',JSON.stringify(d,null,1));}).catch(fail);});
+$('#fileRestore').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();
+  r.onload=function(){var d;try{d=JSON.parse(r.result);if(!d||typeof d!=='object')throw 0;}catch(err){msg('Este arquivo não é um backup válido.');return;}
+    if(!confirm('Restaurar este backup substitui tudo o que está no servidor. Continuar?'))return;
+    act(api('POST','/backup',{sales:d.sales||[],orders:d.orders||[],fairs:d.fairs||[]}),'Backup restaurado.');};
+  r.readAsText(f);e.target.value='';});
+
+function labelCells(){$$('table').forEach(function(t){var ths=$$('thead th',t).map(function(h){return h.textContent;});$$('tbody tr',t).forEach(function(tr){$$('td',tr).forEach(function(td,i){td.setAttribute('data-label',ths[i]||'');});});});}
+function renderAll(){renderResumo();renderVendas();renderPedidos();renderFeiras();renderCap();labelCells();}
+renderAll();
+load().catch(fail);
+})();
+</script>
+</body>
+</html>
