@@ -75,7 +75,9 @@ html{scroll-behavior:smooth}
 #loginBox .msg.err{color:#B42318}#loginBox .msg.ok{color:#1F6B3A}
 #loginBox .close{position:absolute;right:12px;top:22px;width:40px;height:40px;border-radius:50%;border:0;background:#FDEFE8;color:#A8512F;font-size:22px;line-height:1;cursor:pointer}
 @media (max-width:820px){.site-header{column-gap:8px !important;padding-top:12px !important;padding-bottom:12px !important}.site-header>a:first-child{margin-right:auto}.site-header>a:first-child span:first-child{font-size:36px !important}.site-header>a:first-child span:nth-child(2){font-size:16px !important}.login-btn{order:1;padding:8px 12px;white-space:nowrap}.menu-btn{order:2;padding:8px 12px}}
-@media (min-width:821px){.site-header{column-gap:20px !important}.main-nav{gap:6px 12px !important;font-size:15px !important}.hdr-cta{padding:10px 20px !important}}
+@media (min-width:821px){.site-header{column-gap:20px !important}.main-nav{gap:6px 12px !important;font-size:15px !important}.hdr-cta{padding:10px 20px !important}
+ /* O menu fica com a sobra de espaço, e os botões Login e WhatsApp ficam juntinhos */
+ .main-nav{margin:0 auto}.login-btn{margin-left:auto;margin-right:-10px}}
 </style>
 </head>
 <body>
@@ -522,19 +524,18 @@ function closeLogin(){ov.classList.remove('open');ov.setAttribute('aria-hidden',
 function msg(id,t,ok){var m=document.getElementById(id);m.textContent=t;m.className='msg '+(ok?'ok':'err');}
 function validMail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);}
 function goPanel(){location.href='edhi-painel.html#acesso=edi';}
-function isAdmin(){var u=sessao();return !!(u&&u.papel==='ADMIN');}
 function refresh(){var u=sessao();
-  if(u&&u.papel==='ADMIN'){btn.textContent='Entrar';btn.setAttribute('data-mode','admin');}
+  /* Edilene: o botão diz "Entrar", mas sempre abre a tela de login antes do painel */
+  if(u&&u.papel==='ADMIN'){btn.textContent='Entrar';btn.removeAttribute('data-mode');}
   else if(u){btn.textContent='Olá, '+u.nome.split(' ')[0]+' · Sair';btn.setAttribute('data-mode','user');
     document.querySelectorAll('input[data-label="Seu nome"]').forEach(function(i){if(!i.value)i.value=u.nome;});}
   else{btn.textContent='Login';btn.removeAttribute('data-mode');}}
 function sair(){var s=sessao();if(s&&s.token){api('POST','/auth/sair').catch(function(){});}esquecer();refresh();}
 btn.addEventListener('click',function(){var m=btn.getAttribute('data-mode');
-  if(m==='admin'){set('sessionStorage',ADM,'1');goPanel();}
-  else if(m==='user'){sair();}
+  if(m==='user'){sair();}
   else openLogin(false);});
 document.querySelectorAll('[data-open-login]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();
-  if(isAdmin()){set('sessionStorage',ADM,'1');goPanel();}else openLogin(false);});});
+  openLogin(false);});});
 document.getElementById('loginClose').addEventListener('click',closeLogin);
 ov.addEventListener('click',function(e){if(e.target===ov)closeLogin();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))closeLogin();});
