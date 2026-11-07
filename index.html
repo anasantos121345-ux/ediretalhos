@@ -509,7 +509,7 @@ function api(method,path,body){var s=sessao(),h={};if(body)h['Content-Type']='ap
     if(r.status===204)return null;
     return r.json().catch(function(){return {};}).then(function(d){if(!r.ok){var e=new Error(d.mensagem||'Algo deu errado. Tente de novo.');e.status=r.status;
       /* Sem a mensagem da nossa API (ex.: site no GitHub Pages, que não tem /api): conta como servidor fora do ar */
-      if(!d.mensagem&&(r.status===404||r.status===405||r.status===501))e.offline=true;throw e;}return d;});
+      if(!d.mensagem)e.offline=true;throw e;}return d;});
   },function(){var e=new Error('Não foi possível falar com o servidor. Confira a internet e tente de novo.');e.offline=true;throw e;});}
 /* Modo sem servidor: quando a API não está no ar (como no GitHub Pages), o login é conferido aqui no navegador.
    A Edilene entra no painel; contas de clientes ficam salvas só neste navegador. */
