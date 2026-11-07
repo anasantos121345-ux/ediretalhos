@@ -9,6 +9,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 
@@ -26,9 +28,21 @@ class PainelApiTests {
     @Autowired
     BackupService backupService;
 
+    @Autowired
+    WebApplicationContext contexto;
+
+    /** Entra como admin e faz todas as chamadas seguintes já com o token. */
     @BeforeEach
-    void limpar() {
+    void limparEEntrarComoAdmin() throws Exception {
         backupService.apagarTudo();
+        String body = enviar("/api/auth/login", """
+                {"email":"admin@teste.com","senha":"senha-admin"}""")
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        String token = body.replaceAll("(?s).*?\"token\":\"([^\"]+)\".*", "$1");
+        mvc = MockMvcBuilders.webAppContextSetup(contexto)
+                .defaultRequest(get("/").header("Authorization", "Bearer " + token))
+                .build();
     }
 
     private ResultActions enviar(String url, String json) throws Exception {

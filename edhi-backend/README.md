@@ -15,12 +15,13 @@ Testes: `./mvnw test`. Eles usam um banco H2 em memória, então não precisam d
 
 | Camada | Arquivos |
 |---|---|
-| model | `Venda`, `Pedido`, `Feira` |
-| model/enums | `Produto`, `Canal`, `StatusPedido`, `ItemConferencia` |
+| model | `Venda`, `Pedido`, `Feira`, `Usuario`, `Sessao` |
+| model/enums | `Produto`, `Canal`, `StatusPedido`, `ItemConferencia`, `Papel` |
 | model/dto | `VendaRequest`, `PedidoRequest`, `FeiraRequest`, `BackupDTO` |
-| repository | `VendaRepository`, `PedidoRepository`, `FeiraRepository` |
-| service | `VendaService`, `PedidoService`, `FeiraService`, `BackupService` |
-| controller | `VendaController`, `PedidoController`, `FeiraController`, `PainelController` |
+| repository | `VendaRepository`, `PedidoRepository`, `FeiraRepository`, `UsuarioRepository`, `SessaoRepository` |
+| service | `VendaService`, `PedidoService`, `FeiraService`, `BackupService`, `AuthService`, `LimiteTentativas` |
+| controller | `VendaController`, `PedidoController`, `FeiraController`, `PainelController`, `AuthController` |
+| config | `CorsConfig`, `AutenticacaoInterceptor` (confere o token), `AdminInicial` (cria a conta da Edilene) |
 | exception | `RegraNegocioException`, `ApiExceptionHandler` (erros viram `{ "mensagem": "..." }`) |
 
 Os enums usam no JSON os mesmos textos do painel (`"Ecobag"`, `"WhatsApp e Instagram"`, `"Em produção"`). Também aceitam o nome da constante (`"PANO_DE_COPA"`), sem diferenciar maiúsculas nem acentos.
@@ -28,6 +29,14 @@ Os enums usam no JSON os mesmos textos do painel (`"Ecobag"`, `"WhatsApp e Insta
 O painel calcula sozinho o Resumo, a leitura das feiras, as legendas e a planilha CSV a partir das listas que a API devolve.
 
 ## Endpoints
+
+**Login** `/api/auth`
+- `POST /cadastro` `{ "nome", "email", "senha" }`: cria conta de cliente (201) e já devolve o login
+- `POST /login` `{ "email", "senha" }`: devolve `{ "token", "expiraEm", "usuario": { "id", "nome", "email", "papel" } }`
+- `GET /eu`: quem está logado
+- `POST /sair`: encerra este login
+
+Todo o resto pede o cabeçalho `Authorization: Bearer <token>`. Vendas, pedidos, feiras, backup e dados só abrem para o papel `ADMIN` (401 sem login, 403 para cliente).
 
 **Vendas** `/api/vendas`: `POST /`, `GET /` (mais recentes primeiro), `DELETE /{id}`
 
@@ -61,8 +70,16 @@ O painel calcula sozinho o Resumo, a leitura das feiras, as legendas e a planilh
 - Apagar um pedido que já virou venda mantém a venda.
 - Feira sem custo de vaga tem retorno `null` e vai para o fim da lista.
 
+## Login
+
+- A conta da Edilene (`ADMIN`) é criada na primeira vez que a API sobe, com os dados de `edhi.admin.*` em `application.properties`. Depois disso a senha não muda mais por lá.
+- A senha padrão é `1234567`. Antes de usar de verdade, suba a API pela primeira vez com outra: `set EDHI_ADMIN_SENHA=uma-senha-forte` (Windows) antes do `mvnw.cmd spring-boot:run`.
+- Senhas são guardadas com BCrypt. O token é aleatório e o banco guarda só o hash SHA-256 dele. O login dura 7 dias (`edhi.sessao.horas`).
+- 5 senhas erradas seguidas para o mesmo e-mail travam o login dele por 15 minutos (429).
+- E-mail é comparado sem diferenciar maiúsculas. Senha errada e e-mail inexistente dão a mesma resposta.
+
 ## Pontos de atenção
 
-- Não há autenticação: quem acessar a porta 8080 lê e altera tudo. Antes de colocar na internet, é preciso um login.
+- Fora do `localhost`, use HTTPS: sem ele, senha e token viajam abertos pela rede.
 - O CORS está aberto para qualquer origem (`CorsConfig`), para o HTML funcionar aberto direto do arquivo.
 - O painel chama `http://localhost:8080/api`. Para usar outro endereço, abra-o uma vez com `?api=http://servidor:8080/api` no fim da URL; o endereço fica salvo no navegador.

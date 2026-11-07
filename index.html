@@ -93,7 +93,7 @@ html{scroll-behavior:smooth}
 <nav id="mainNav" class="main-nav" aria-label="Principal" style="display:flex;flex-wrap:wrap;gap:6px 26px;font-weight:800;font-size:16px">
 <a class="nav" href="#pecas">Peças</a><a class="nav" href="#historia">Sobre</a><a class="nav" href="#valores">Valores</a><a class="nav" href="#eventos">Eventos</a><a class="nav" href="#aulas">Aulas</a><a class="nav" href="#doacao">Doar retalhos</a><a class="nav" href="#agenda">Agenda</a><a class="nav" href="#patrocinio">Patrocine</a><a class="nav" href="#encomendar">Encomendar</a>
 </nav>
-<button type="button" class="login-btn" id="loginBtn" aria-haspopup="dialog">Entrar</button>
+<button type="button" class="login-btn" id="loginBtn" aria-haspopup="dialog">Login</button>
 <a class="btn hdr-cta" href="https://wa.me/message/XAJAYOPIHMDYL1" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;padding:12px 26px;font-weight:800;border-radius:999px;background:#CF3523;color:#fff">WhatsApp</a>
 </header>
 
@@ -449,13 +449,13 @@ html{scroll-behavior:smooth}
 <div id="loginBox">
 <div class="stripe" aria-hidden="true"></div>
 <button type="button" class="close" id="loginClose" aria-label="Fechar">&times;</button>
-<h2 id="loginTitle">Entrar</h2>
+<h2 id="loginTitle">Login</h2>
 <p class="sub" id="loginSub">Acesse sua conta éDhi Retalhos.</p>
-<div class="tabs" role="tablist"><button type="button" role="tab" id="tabIn" aria-selected="true">Entrar</button><button type="button" role="tab" id="tabUp" aria-selected="false">Cadastrar</button></div>
+<div class="tabs" role="tablist"><button type="button" role="tab" id="tabIn" aria-selected="true">Login</button><button type="button" role="tab" id="tabUp" aria-selected="false">Cadastrar</button></div>
 <form id="formIn" novalidate>
 <label for="inMail">E-mail</label><input id="inMail" type="email" autocomplete="email" placeholder="voce@email.com" required>
 <label for="inPass">Senha</label><div class="pw"><input id="inPass" type="password" autocomplete="current-password" placeholder="Sua senha" required><button type="button" data-toggle="inPass">Mostrar</button></div>
-<button type="submit" class="go">Entrar</button>
+<button type="submit" class="go">Login</button>
 <div class="msg" id="msgIn" role="status" aria-live="polite"></div>
 </form>
 <form id="formUp" novalidate style="display:none">
@@ -492,20 +492,29 @@ n.addEventListener('click',function(e){if(e.target.tagName==='A'){n.classList.re
 
 <script>
 (function(){
-var ADMIN_MAIL='edileneeumais@gmail.com',ADMIN_PASS='1234567',USERS='edhi_usuarios',CUR='edhi_cliente',ADM='edhi_admin';
+/* Login feito pela API (edhi-backend). As senhas ficam só no servidor, com BCrypt.
+   Endereço da API: http://localhost:8080/api, ou abra o site uma vez com ?api=http://servidor:8080/api */
+var CUR='edhi_sessao',ADM='edhi_admin',API_KEY='edhi_api';
 var mem={};
 function get(st,k){try{return window[st].getItem(k);}catch(e){return mem[st+k]||null;}}
 function set(st,k,v){try{window[st].setItem(k,v);}catch(e){mem[st+k]=v;}}
 function del(st,k){try{window[st].removeItem(k);}catch(e){delete mem[st+k];}}
-function users(){try{return JSON.parse(get('localStorage',USERS)||'[]');}catch(e){return [];}}
-function hash(t){var enc=new TextEncoder().encode('edhi|'+t);
-  if(window.crypto&&crypto.subtle){return crypto.subtle.digest('SHA-256',enc).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2);}).join('');});}
-  return Promise.resolve('b64:'+btoa(unescape(encodeURIComponent(t))));}
+var API=(function(){var q=new URLSearchParams(location.search).get('api');if(q){set('localStorage',API_KEY,q);return q;}return get('localStorage',API_KEY)||'http://localhost:8080/api';})().replace(/\/$/,'');
+function sessao(){try{return JSON.parse(get('localStorage',CUR)||'null');}catch(e){return null;}}
+function api(method,path,body){var s=sessao(),h={};if(body)h['Content-Type']='application/json';if(s&&s.token)h['Authorization']='Bearer '+s.token;
+  return fetch(API+path,{method:method,headers:h,body:body?JSON.stringify(body):undefined}).then(function(r){
+    if(r.status===204)return null;
+    return r.json().catch(function(){return {};}).then(function(d){if(!r.ok){var e=new Error(d.mensagem||'Algo deu errado. Tente de novo.');e.status=r.status;throw e;}return d;});
+  },function(){throw new Error('Não foi possível falar com o servidor. Confira a internet e tente de novo.');});}
+function guardar(d){set('localStorage',CUR,JSON.stringify({token:d.token,nome:d.usuario.nome,email:d.usuario.email,papel:d.usuario.papel}));
+  if(d.usuario.papel==='ADMIN')set('sessionStorage',ADM,'1');else del('sessionStorage',ADM);}
+function esquecer(){del('localStorage',CUR);del('sessionStorage',ADM);}
+function ocupado(form,sim){var b=form.querySelector('button[type=submit]');b.disabled=sim;b.style.opacity=sim?'.6':'';}
 var ov=document.getElementById('loginOv'),btn=document.getElementById('loginBtn'),last=null;
 var fIn=document.getElementById('formIn'),fUp=document.getElementById('formUp'),tIn=document.getElementById('tabIn'),tUp=document.getElementById('tabUp');
 var title=document.getElementById('loginTitle'),sub=document.getElementById('loginSub');
 function tab(up){fIn.style.display=up?'none':'flex';fUp.style.display=up?'flex':'none';tIn.setAttribute('aria-selected',up?'false':'true');tUp.setAttribute('aria-selected',up?'true':'false');
-  title.textContent=up?'Criar conta':'Entrar';sub.textContent=up?'Cadastre-se para acompanhar seus pedidos e falar com a Edilene.':'Acesse sua conta éDhi Retalhos.';
+  title.textContent=up?'Criar conta':'Login';sub.textContent=up?'Cadastre-se para acompanhar seus pedidos e falar com a Edilene.':'Acesse sua conta éDhi Retalhos.';
   document.getElementById('msgIn').textContent='';document.getElementById('msgUp').textContent='';}
 function openLogin(up){last=document.activeElement;ov.classList.add('open');ov.setAttribute('aria-hidden','false');tab(!!up);
   setTimeout(function(){document.getElementById(up?'upName':'inMail').focus();},30);}
@@ -513,17 +522,19 @@ function closeLogin(){ov.classList.remove('open');ov.setAttribute('aria-hidden',
 function msg(id,t,ok){var m=document.getElementById(id);m.textContent=t;m.className='msg '+(ok?'ok':'err');}
 function validMail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);}
 function goPanel(){location.href='edhi-painel.html#acesso=edi';}
-function refresh(){var u=null;try{u=JSON.parse(get('localStorage',CUR)||'null');}catch(e){}
-  if(get('sessionStorage',ADM)==='1'){btn.textContent='Meu painel';btn.setAttribute('data-mode','admin');}
+function isAdmin(){var u=sessao();return !!(u&&u.papel==='ADMIN');}
+function refresh(){var u=sessao();
+  if(u&&u.papel==='ADMIN'){btn.textContent='Entrar';btn.setAttribute('data-mode','admin');}
   else if(u){btn.textContent='Olá, '+u.nome.split(' ')[0]+' · Sair';btn.setAttribute('data-mode','user');
     document.querySelectorAll('input[data-label="Seu nome"]').forEach(function(i){if(!i.value)i.value=u.nome;});}
-  else{btn.textContent='Entrar';btn.removeAttribute('data-mode');}}
+  else{btn.textContent='Login';btn.removeAttribute('data-mode');}}
+function sair(){var s=sessao();if(s&&s.token){api('POST','/auth/sair').catch(function(){});}esquecer();refresh();}
 btn.addEventListener('click',function(){var m=btn.getAttribute('data-mode');
-  if(m==='admin'){goPanel();}
-  else if(m==='user'){del('localStorage',CUR);refresh();}
+  if(m==='admin'){set('sessionStorage',ADM,'1');goPanel();}
+  else if(m==='user'){sair();}
   else openLogin(false);});
 document.querySelectorAll('[data-open-login]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();
-  if(get('sessionStorage',ADM)==='1'){goPanel();}else openLogin(false);});});
+  if(isAdmin()){set('sessionStorage',ADM,'1');goPanel();}else openLogin(false);});});
 document.getElementById('loginClose').addEventListener('click',closeLogin);
 ov.addEventListener('click',function(e){if(e.target===ov)closeLogin();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))closeLogin();});
@@ -533,26 +544,29 @@ fIn.addEventListener('submit',function(e){e.preventDefault();
   var mail=document.getElementById('inMail').value.trim().toLowerCase(),pass=document.getElementById('inPass').value;
   if(!validMail(mail)){msg('msgIn','Digite um e-mail válido.');return;}
   if(!pass){msg('msgIn','Digite a senha.');return;}
-  if(mail===ADMIN_MAIL){
-    if(pass===ADMIN_PASS){set('sessionStorage',ADM,'1');msg('msgIn','Bem-vinda, Edilene! Abrindo seu painel...',true);setTimeout(goPanel,500);}
-    else msg('msgIn','E-mail ou senha incorretos.');
-    return;}
-  hash(pass).then(function(h){
-    var u=users().filter(function(x){return x.email===mail&&x.h===h;})[0];
-    if(!u){msg('msgIn','E-mail ou senha incorretos. Ainda não tem conta? Toque em Cadastrar.');return;}
-    set('localStorage',CUR,JSON.stringify({nome:u.nome,email:u.email}));
-    msg('msgIn','Pronto, '+u.nome.split(' ')[0]+'! Você está dentro.',true);refresh();setTimeout(closeLogin,900);});});
+  ocupado(fIn,true);msg('msgIn','Entrando...',true);
+  api('POST','/auth/login',{email:mail,senha:pass}).then(function(d){
+    guardar(d);document.getElementById('inPass').value='';
+    if(d.usuario.papel==='ADMIN'){msg('msgIn','Bem-vinda, Edilene! Abrindo seu painel...',true);setTimeout(goPanel,500);return;}
+    msg('msgIn','Pronto, '+d.usuario.nome.split(' ')[0]+'! Você está dentro.',true);refresh();setTimeout(closeLogin,900);
+  }).catch(function(err){
+    msg('msgIn',err.status===401?'E-mail ou senha incorretos. Ainda não tem conta? Toque em Cadastrar.':err.message);
+  }).then(function(){ocupado(fIn,false);});});
 fUp.addEventListener('submit',function(e){e.preventDefault();
   var nome=document.getElementById('upName').value.trim(),mail=document.getElementById('upMail').value.trim().toLowerCase(),pass=document.getElementById('upPass').value;
   if(nome.length<2){msg('msgUp','Digite seu nome.');return;}
   if(!validMail(mail)){msg('msgUp','Digite um e-mail válido.');return;}
   if(pass.length<6){msg('msgUp','A senha precisa ter pelo menos 6 caracteres.');return;}
-  if(mail===ADMIN_MAIL||users().some(function(x){return x.email===mail;})){msg('msgUp','Este e-mail já tem cadastro. Toque em Entrar.');return;}
-  hash(pass).then(function(h){var l=users();l.push({nome:nome,email:mail,h:h});set('localStorage',USERS,JSON.stringify(l));
-    set('localStorage',CUR,JSON.stringify({nome:nome,email:mail}));
-    msg('msgUp','Conta criada! Bem-vinda, '+nome.split(' ')[0]+'.',true);refresh();setTimeout(closeLogin,1100);});});
+  ocupado(fUp,true);msg('msgUp','Criando sua conta...',true);
+  api('POST','/auth/cadastro',{nome:nome,email:mail,senha:pass}).then(function(d){
+    guardar(d);document.getElementById('upPass').value='';
+    msg('msgUp','Conta criada! Bem-vinda, '+d.usuario.nome.split(' ')[0]+'.',true);refresh();setTimeout(closeLogin,1100);
+  }).catch(function(err){msg('msgUp',err.message);}).then(function(){ocupado(fUp,false);});});
 if(location.hash==='#login'){openLogin(false);}
 refresh();
+/* Confere com o servidor se o login guardado ainda vale (pode ter vencido ou saído em outro aparelho) */
+if(sessao()){api('GET','/auth/eu').then(function(u){var s=sessao();if(s){s.nome=u.nome;s.papel=u.papel;set('localStorage',CUR,JSON.stringify(s));}refresh();})
+  .catch(function(err){if(err.status===401){esquecer();refresh();}});}
 })();
 </script>
 </body>
